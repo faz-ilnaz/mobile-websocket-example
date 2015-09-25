@@ -2,6 +2,10 @@ package se.elabs.websocketexampleclient;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,13 +25,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class MainActivity extends Activity {
-    private WebSocketService webSocketService;
 
+    int notificationId = 1001;
+
+    private Activity that = this;
+
+    private WebSocketService webSocketService;
+    private NotificationService notificationService;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webSocketService = new WebSocketService("ws://jbosswildfly-gdcgamification.rhcloud.com:8000/wsrest/echo");
+        notificationService = new NotificationService();
         webSocketService.addHandler(new WebSocketService.Handler() {
             @Override
             public void handle(final String message) {
@@ -36,6 +46,7 @@ public class MainActivity extends Activity {
                     public void run() {
                         TextView textView = (TextView) findViewById(R.id.messages);
                         textView.setText(textView.getText() + "\n" + message);
+                        notificationService.sendNotification(that);
                     }
                 });
             }
@@ -91,4 +102,5 @@ public class MainActivity extends Activity {
         webSocketService.sendMessage("Username:" + editText.getText().toString());
         editText.setText("");
     }
+
 }
