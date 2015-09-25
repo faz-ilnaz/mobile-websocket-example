@@ -21,14 +21,26 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public class MainActivity extends Activity {
-    private WebSocketClient mWebSocketClient;
+    private WebSocketService webSocketService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        connectWebSocket();
+        webSocketService = new WebSocketService("ws://jbosswildfly-gdcgamification.rhcloud.com:8000/wsrest/echo");
+        webSocketService.addHandler(new WebSocketService.Handler() {
+            @Override
+            public void handle(final String message) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TextView textView = (TextView) findViewById(R.id.messages);
+                        textView.setText(textView.getText() + "\n" + message);
+                    }
+                });
+            }
+        });
+        webSocketService.connect();
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
@@ -74,53 +86,9 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void connectWebSocket() {
-        URI uri;
-        try {
-//            uri = new URI("ws://192.168.169.3:8080");
-            uri = new URI("ws://jbosswildfly-gdcgamification.rhcloud.com:8000/wsrest/echo");
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        mWebSocketClient = new WebSocketClient(uri) {
-            @Override
-            public void onOpen(ServerHandshake serverHandshake) {
-                Log.i("Websocket", "Opened");
-//                mWebSocketClient.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL);
-            }
-
-            @Override
-            public void onMessage(String s) {
-                final String message = s;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView textView = (TextView)findViewById(R.id.messages);
-                        textView.setText(textView.getText() + "\n" + message);
-                    }
-                });
-            }
-
-            @Override
-            public void onClose(int i, String s, boolean b) {
-                Log.i("Websocket", "Closed " + s);
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.i("Websocket", "Error " + e.getMessage());
-            }
-        };
-        mWebSocketClient.connect();
-    }
-
     public void sendMessage(View view) {
         EditText editText = (EditText)findViewById(R.id.message);
-
-        mWebSocketClient.send("Username:" + editText.getText().toString());
-
+        webSocketService.sendMessage("Username:" + editText.getText().toString());
         editText.setText("");
     }
 }
