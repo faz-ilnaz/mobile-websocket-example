@@ -46,7 +46,9 @@ public class MainActivity extends Activity {
                     public void run() {
                         TextView textView = (TextView) findViewById(R.id.messages);
                         textView.setText(textView.getText() + "\n" + message);
-                        notificationService.sendNotification(that);
+                        if(message.startsWith("You received a new badge")) {
+                            notificationService.sendNotification(that);
+                        }
                     }
                 });
             }
