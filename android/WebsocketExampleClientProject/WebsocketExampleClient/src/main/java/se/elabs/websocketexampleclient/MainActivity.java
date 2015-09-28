@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webSocketService = new WebSocketService("ws://jbosswildfly-gdcgamification.rhcloud.com:8000/wsrest/echo");
-        notificationService = new NotificationService();
+        notificationService = ((WSApplication)getApplicationContext()).getNotificationService();
         webSocketService.addHandler(new WebSocketService.Handler() {
             @Override
             public void handle(final String message) {
@@ -47,6 +47,7 @@ public class MainActivity extends Activity {
                         TextView textView = (TextView) findViewById(R.id.messages);
                         textView.setText(textView.getText() + "\n" + message);
                         if(message.startsWith("You received a new badge")) {
+                            notificationService.incrementNotificationCount();
                             notificationService.sendNotification(that);
                         }
                     }

@@ -6,10 +6,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class BadgesListActivity extends Activity {
+
+   private NotificationService notificationService;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.badges_list_activity);
+        System.out.println("Clear notification count");
+        notificationService = ((WSApplication)getApplicationContext()).getNotificationService();
+        notificationService.clearNotificationCount();
     }
 
 

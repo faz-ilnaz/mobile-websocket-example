@@ -7,18 +7,33 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.view.View;
 
-public class NotificationService {
+import java.io.Serializable;
+
+public class NotificationService implements Serializable {
 
     int notificationId = 1001;
 
+    private int notificationCount = 0;
+
+    public int getNotificationCount(){
+        return notificationCount;
+    }
+    public void setNotificationCount(int count){
+        this.notificationCount = count;
+    }
 
     public void sendNotification(Activity activity) {
         Intent intent = new Intent(activity, BadgesListActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(activity, 0, intent, 0);
-
+        String contentText = null;
+        if(this.getNotificationCount() == 1){
+            contentText = "Вы получили бейдж!";
+        }else{
+            contentText = String.format("Вы получили %d оповещений",this.getNotificationCount());
+        }
         Notification notification  = new Notification.Builder(activity)
                 .setContentTitle("Оповещение")
-                .setContentText("Вы получили бейдж!")
+                .setContentText(contentText)
                 .setSmallIcon(android.R.drawable.star_on)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
@@ -29,5 +44,11 @@ public class NotificationService {
                 (NotificationManager) activity.getSystemService(
                         activity.NOTIFICATION_SERVICE);
         notificationManager.notify(notificationId, notification);
+    }
+    public void incrementNotificationCount(){
+        this.setNotificationCount(this.getNotificationCount() + 1);
+    }
+    public void clearNotificationCount(){
+        this.setNotificationCount(0);
     }
 }
