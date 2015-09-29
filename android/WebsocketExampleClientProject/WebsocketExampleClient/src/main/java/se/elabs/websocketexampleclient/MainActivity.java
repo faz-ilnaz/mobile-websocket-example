@@ -36,7 +36,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        webSocketService = new WebSocketService("ws://jbosswildfly-gdcgamification.rhcloud.com:8000/wsrest/echo");
+        webSocketService = ((WSApplication)getApplicationContext()).getWebSocketService();
         notificationService = ((WSApplication)getApplicationContext()).getNotificationService();
         webSocketService.addHandler(new WebSocketService.Handler() {
             @Override
@@ -44,11 +44,13 @@ public class MainActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView textView = (TextView) findViewById(R.id.messages);
-                        textView.setText(textView.getText() + "\n" + message);
                         if(message.startsWith("You received a new badge")) {
                             notificationService.incrementNotificationCount();
                             notificationService.sendNotification(that);
+                            ((WSApplication)getApplicationContext()).getMessages().add(message);
+                        }else{
+                            TextView textView = (TextView) findViewById(R.id.messages);
+                            textView.setText(textView.getText() + "\n" + message);
                         }
                     }
                 });

@@ -5,6 +5,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.service.notification.NotificationListenerService;
 import android.view.View;
 
 import java.io.Serializable;
@@ -29,7 +30,7 @@ public class NotificationService implements Serializable {
         if(this.getNotificationCount() == 1){
             contentText = "Вы получили бейдж!";
         }else{
-            contentText = String.format("Вы получили %d оповещений",this.getNotificationCount());
+            contentText = String.format("У вас %d новых оповещений",this.getNotificationCount());
         }
         Notification notification  = new Notification.Builder(activity)
                 .setContentTitle("Оповещение")
