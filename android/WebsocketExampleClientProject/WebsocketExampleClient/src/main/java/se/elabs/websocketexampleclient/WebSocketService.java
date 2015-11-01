@@ -6,14 +6,24 @@ import android.widget.TextView;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+import java.util.logging.XMLFormatter;
 
 public class WebSocketService {
 
     private WebSocketClient mWebSocketClient;
     private String url;
-    private Handler handler;
+
+    private final List<Handler> handlers = new CopyOnWriteArrayList<Handler>();
 
     public WebSocketService(String url) {
         this.url = url;
@@ -35,9 +45,10 @@ public class WebSocketService {
 
             @Override
             public void onMessage(String s) {
-                final String message = s;
-                if(handler != null){
-                    handler.handle(message);
+                for(Handler handler : handlers) {
+                    if(handler != null){
+                        handler.handle(s);
+                    }
                 }
             }
 
@@ -57,8 +68,19 @@ public class WebSocketService {
         mWebSocketClient.send(message);
     }
     public void addHandler(Handler handler){
-        this.handler = handler;
+        if (handler == null) {
+            throw new NullPointerException("handler == null");
+        }
+        this.handlers.add(handler);
     }
+
+    public void removeHandler(Handler handler) {
+        if (handler == null) {
+            return;
+        }
+        this.handlers.remove(handler);
+    }
+
     public static interface Handler{
         public void handle(String message);
     }

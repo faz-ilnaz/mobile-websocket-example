@@ -38,8 +38,6 @@ public class NotificationService implements Serializable {
                 .setSmallIcon(android.R.drawable.star_on)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .addAction(android.R.drawable.ic_menu_gallery,
-                        "Open", pendingIntent)
                 .build();
         NotificationManager notificationManager =
                 (NotificationManager) activity.getSystemService(
@@ -51,5 +49,12 @@ public class NotificationService implements Serializable {
     }
     public void clearNotificationCount(){
         this.setNotificationCount(0);
+    }
+
+    public void removeNotification(Activity activity) {
+        NotificationManager notificationManager =
+                (NotificationManager) activity.getSystemService(
+                        activity.NOTIFICATION_SERVICE);
+        notificationManager.cancel(notificationId);
     }
 }
