@@ -5,9 +5,11 @@ import android.app.Fragment;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -48,6 +50,8 @@ public class MainActivity extends Activity {
                             notificationService.incrementNotificationCount();
                             notificationService.sendNotification(that);
                             ((WSApplication)getApplicationContext()).getMessages().add(message);
+                        } else if (message.startsWith("Connecting")) {
+                            webSocketService.sendMessage("Username:" + getDeviceId());
                         }else{
                             TextView textView = (TextView) findViewById(R.id.messages);
                             textView.setText(textView.getText() + "\n" + message);
@@ -102,10 +106,17 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void sendMessage(View view) {
-        EditText editText = (EditText)findViewById(R.id.message);
-        webSocketService.sendMessage("Username:" + editText.getText().toString());
-        editText.setText("");
+//    public void sendMessage(View view) {
+//        EditText editText = (EditText)findViewById(R.id.message);
+//        webSocketService.sendMessage("Username:" + editText.getText().toString());
+//        editText.setText("");
+//    }
+
+    private String getDeviceId() {
+        TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+        String deviceID = tMgr.getDeviceId();
+        System.out.println(deviceID);
+        return deviceID;
     }
 
 }
